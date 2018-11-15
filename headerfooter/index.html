@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./src/reset.css">
+    <script src="./src/jquery.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="./src/ajax.js"></script>
+    <script>
+        $(document).ready(function(){
+            getData();
+            var timeout = false;   
+            var isScrolling = false;
+            var clock = true;
+            $(window).scroll(function(){
+                if(clock){
+                    toggle(true);
+                    clock = false;
+                }
+                if (timeout){clearTimeout(timeout);}   
+                timeout = setTimeout(function(){   
+                    toggle(false);
+                    clock = true;
+                },100);   
+            });   
+        });
+        function toggle(option){
+            if(option){
+                $("#toggle-header").animate({ top: '-4.5rem' });
+                $("#footer").animate({ bottom: '-4.4rem' }); 
+            }else{
+                setTimeout(() => {
+                    $("#toggle-header").animate({ top: '2rem' });
+                    $("#footer").animate({ bottom: '0rem' });
+                }, 1000);
+            }
+        }
+        function poke(data){
+            var template = `
+                    <div class="contentItem">
+                        <div class="left">
+                            <div class="top">
+                                <div class="item ">
+                                    <span class="time">${data.startTime}</span>
+                                    <p class="desc">${data.startAir}</p>
+                                </div>
+                                <div class="line">
+                                    <div class="time-info">
+                                        <p class="howlong"></p>
+                                        <div class="plane-info">
+                                            <div class="arrow-right"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item " style="position: relative;text-align: right;">
+                                    <span class="time">${data.endTime}</span>
+                                    <p class="desc">${data.endAir}</p>
+                                </div>
+                            </div>
+                            <div class="bottom">
+                                <p class="desc">${data.plane}</p>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <span class="price">￥${data.price}</span>
+                            <span class="desc">${data.desc}</span>
+                            <span class="rise">持续涨价中</span>
+                        </div>
+                    </div>
+                    `;
+            return template;
+        }
+        function getData(){
+            ajax({
+                url:'http://127.0.0.1:8080/getData',
+                type:'get',
+                data:{},
+                success(data){
+                    var json = eval('('+data+')').need;
+                    console.log(json)
+                    json.forEach(element => {
+                        document.getElementById("content").innerHTML+=poke(element);
+                    });
+
+                }
+            })
+        }
+        
+
+    </script>
+    <style>
+        html {
+            /* background: rgba(0,0, 0, 0.2) */
+        }
+
+        .img-l {
+            width: 2rem;
+        }
+
+        .red {
+            background: red;
+        }
+
+        .green {
+            background: green;
+        }
+
+        .blue {
+            background: blue;
+        }
+
+        .header {
+            color: white;
+            background: #1cb3c3;
+        }
+
+        .header-top-container {
+            font-size: 1.4rem;
+            line-height: 2rem;
+            height: 2.1rem;
+            z-index: 100;
+            background: #1cb3c3;
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+        }
+
+        .toggle-top {
+            position: fixed;
+            top: 0;
+            background: red;
+        }
+
+        .header-bottom-container {
+            padding: 1rem 0.4rem 1rem 0.4rem;
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-around;
+            line-height: 1.5rem;
+            align-items: center;
+            height: 4.5rem;
+            background: #1cb3c3;
+            position: fixed;
+            top: 2rem;
+            z-index: -1;
+        }
+
+        .header-bottom-item {
+            width: 15%;
+            flex-grow: 1;
+        }
+
+        .header-bottom-item img {
+            width: 50%;
+        }
+
+        .header-bottom-item-active {
+            background: white;
+            color: #1cb3c3;
+            border-radius: 0.2rem;
+        }
+
+        .header-bottom-item {
+            /* border: 1px solid red; */
+            text-align: center;
+        }
+
+        .last-item-calendar {
+            border-left: 1px solid #cbcbcb;
+            flex-grow: 4;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0rem;
+            width: 100%;
+        }
+
+        .footer img {
+            width: 25%;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0 0.5rem 0;
+            border-top: 1px solid #cbcbcb;
+            color: #cbcbcb;
+            z-index: 100;
+            background: #f8f8f8;
+        }
+
+        .footer-item {
+            width: 25%;
+            text-align: center;
+            line-height: 1.5rem;
+        }
+
+        .text-active {
+            color: #1cb3c3;
+        }
+
+        .content {
+            z-index: -1;
+        }
+
+        .contentItem {
+            display: flex;
+            padding: 10px 15px;
+            position: relative;
+            border-bottom: 1px solid rgba(197, 197, 197, 0.3);
+        }
+
+        .contentItem .left {
+            flex: 5;
+            font-size: 0px;
+            width: 0;
+        }
+
+        .contentItem .top {
+            position: relative;
+            display: flex;
+        }
+
+        .contentItem .top .item {
+            display: inline-block;
+            width: 30%;
+            flex: 2;
+            font-size: 0.75rem;
+
+        }
+
+        .contentItem .right {
+            flex: 2;
+        }
+
+        .desc {
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: #999;
+        }
+
+        .line {
+            display: 5;
+            width: 39%;
+        }
+
+        .line .time-info {
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            font-size: 12px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            color: #999;
+            padding: 0 8px;
+            height: 26px;
+            margin-top: 1rem;
+            vertical-align: bottom;
+            position: relative;
+        }
+
+        .howlong {
+            font-size: 12px;
+            -webkit-transform: scale(0.8);
+            -moz-transform: scale(0.8);
+            -ms-transform: scale(0.8);
+            -o-transform: scale(0.8);
+            transform: scale(0.8);
+            position: absolute;
+            top: -13px;
+            left: 50%;
+            width: 54px;
+            margin-left: -27px;
+            text-align: center;
+        }
+
+        .plane-info {
+            position: relative;
+            height: 12px;
+        }
+
+        .arrow-right {
+            position: absolute;
+            width: 100%;
+            border-bottom: 1px solid #999;
+        }
+
+        .arrow-right:after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            display: inline-block;
+            -webkit-transform-origin: bottom right;
+            -moz-transform-origin: bottom right;
+            -ms-transform-origin: bottom right;
+            -o-transform-origin: bottom right;
+            transform-origin: bottom right;
+            border-right: 1px solid #999;
+            -webkit-transform: rotate(-60deg);
+            -moz-transform: rotate(-60deg);
+            -ms-transform: rotate(-60deg);
+            -o-transform: rotate(-60deg);
+            transform: rotate(-60deg);
+            float: right;
+        }
+
+        .bottom {
+            color: #999;
+            padding: 2px;
+            line-height: 1rem;
+        }
+
+        .time {
+            font-size: 1.25rem;
+            line-height: 1.5rem;
+        }
+
+        .right {
+            text-align: right;
+            color: #ff8205;
+            flex: 2;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            flex-direction: column;
+            width: 0;
+        }
+
+        .right .rise {
+            line-height: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            color: #fff;
+            width: 5rem;
+            background: #ff8205;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="position: relative;;">
+        <div class="header" id="header">
+            <div class="header-top-container">
+                <div class="header-top-item"><a href="#" id="right" onclick="toggle(true)"><img class="img-l" src="./img/right.png" alt=""></a></div>
+                <div class="header-top-item"><span>北京-上海</span></div>
+                <div class="header-top-item"><a href="#" id="search" onclick="toggle(false)"><img class="img-l" src="./img/search.png" alt=""></a></div>
+            </div>
+            <div class="header-bottom-container" id="toggle-header" style="z-index: 1">
+                <div class="header-bottom-item header-bottom-item-active">
+                    <span>02-05</span>
+                    <span>今天</span>
+                    <span>￥363</span>
+                </div>
+                <div class="header-bottom-item">
+                    <span>02-05</span>
+                    <span>今天</span>
+                    <span>￥363</span>
+                </div>
+                <div class="header-bottom-item">
+                    <span>02-05</span>
+                    <span>今天</span>
+                    <span>￥363</span>
+                </div>
+                <div class="header-bottom-item">
+                    <span>02-05</span>
+                    <span>今天</span>
+                    <span>￥363</span>
+                </div>
+                <div class="header-bottom-item">
+                    <span>02-05</span>
+                    <span>今天</span>
+                    <span>￥363</span>
+                </div>
+                <div class="header-bottom-item last-item-calendar">
+                    <img src="./img/calender.png" alt=""><br />
+                    <span>更多日期</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="content" id="content" style="margin-top:8.5rem;z-index: -1;overflow: auto">
+        </div>
+        <div class="footer" id="footer">
+            <div class="footer-container">
+                <div class="footer-item">
+                    <img src="./img/screen.png" alt="">
+                    <br />
+                    <span>筛选</span>
+                </div>
+                <div class="footer-item">
+                    <img src="./img/order.png" alt="">
+                    <br />
+                    <span class="text-active">推荐排序</span>
+                </div>
+                <div class="footer-item">
+                    <img src="./img/time.png" alt="">
+                    <br />
+                    <span>时间</span>
+                </div>
+                <div class="footer-item">
+                    <img src="./img/price.png" alt="">
+                    <br />
+                    <span>价格</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+    </script>
+</body>
+
+</html>
