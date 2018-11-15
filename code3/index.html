@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <script type="text/javascript" src='./utils/ajax.js'></script>
+  <link href="https://cdn.bootcss.com/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .container{
+      width: 80%;
+      margin: 10rem auto;
+      /* background: red; */
+    }
+    .header{
+      display: flex;
+      justify-content: flex-start;
+    }
+    .header input{
+      width: 50%;
+    }
+    .header button{
+      margin: 0 10rem ; 
+    }
+    .content{
+      margin-top: 2rem;
+    }
+    .content thead{
+      background: #f7f7f7;
+    }
+    .content .table{
+      border-bottom: 1px solid #dee2e6;
+      border-top: 1px solid #dee2e6;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <a style="width:100%;text-align:center;display:block;margin-top: 2rem" target="_blank" href="https://www.xs8.cn/">目标爬虫网站</a>
+  <div class="container">
+    <div class="header">
+      <input type='text' id='ipt' class="form-control" value="https://www.xs8.cn/chapter/9957174303982103/26728656108718050"
+        placeholder="输入文章链接">
+      <button type="button" id="btn" class="btn btn-primary">添加</button>
+    </div>
+    <div class="content">
+      <table class="table">
+        <thead>
+          <tr>
+            <td>标题</td>
+            <td>字数</td>
+            <td>英文字数</td>
+            <td>中文字数</td>
+            <td>数字数</td>
+            <td>标点符号数</td>
+          </tr>
+        </thead>
+        <tbody id="items">
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <script type="text/javascript">
+    window.onload=function(){
+      ajax({
+        url: 'http://localhost:3000/getData',
+        type: 'get',
+        data: {},
+        success(data) {
+          var json = JSON.parse(eval('(' + data + ')').data);
+          console.log(json);
+          json.forEach((item)=>{
+            document.getElementById("items").innerHTML+= `
+              <tr>
+                <td><a href="${item.title}">${item.title}</a></td>
+                <td>${item.cn+item.en+item.punc+item.num}</td>
+                <td>${item.en}</td>
+                <td>${item.cn}</td>
+                <td>${item.num}</td>
+                <td>${item.punc}</td>
+              </tr>
+            `;
+          })
+          // document.getElementById("main").innerHTML = json;
+          // document.getElementById("items").innerHTML+= `
+          // <tr>
+          //   <td><a href="${json.title}">${json.title}</a></td>
+          //   <td>${json.cn+json.en+json.punc+json.num}</td>
+          //   <td>${json.en}</td>
+          //   <td>${json.cn}</td>
+          //   <td>${json.num}</td>
+          //   <td>${json.punc}</td>
+          // </tr>
+          // `;
+        }
+      })
+    }
+    btn['onclick'] = x => {
+      ajax({
+        url: 'http://localhost:3000/getMsg',
+        type: 'get',
+        data: {
+          str: ipt.value,
+          title: ".j_chapterName",
+          passage: ".read-content"
+          // title: title.value,
+          // passage: passage.value
+        },
+        success(data) {
+          var json = eval('(' + data + ')').need;
+          console.log(json);
+          // document.getElementById("main").innerHTML = json;
+          document.getElementById("items").innerHTML+= `
+          <tr>
+            <td><a href="${json.title}">${json.title}</a></td>
+            <td>${json.cn+json.en+json.punc+json.num}</td>
+            <td>${json.en}</td>
+            <td>${json.cn}</td>
+            <td>${json.num}</td>
+            <td>${json.punc}</td>
+          </tr>
+          `;
+        }
+      })
+    }
+  </script>
+</body>
+
+</html>
